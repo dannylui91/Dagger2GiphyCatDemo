@@ -1,0 +1,48 @@
+Good introduction to dagger 2:
+https://medium.com/@isoron/a-friendly-introduction-to-dagger-2-part-1-dbdf2f3fb17b#.kqi8581e5
+
+What is dagger 2?
+Dagger 2 is dependency injection framework.
+It is based on the Java Specification Request (JSR) 330.
+It uses code generation and is based on annotations (annotation processor).
+
+What is dependency inject?
+Dependency injection is a technique that makes classes more easy to test and to reuse.
+Look at above link for more on dependency injection.
+Basically, for example you have a WeatherReporter class and it requires you to instantiate two other classes:
+LocationService class and WeatherService class in order to give you a weather report. WeatherReporter class
+needs two other objects to perform its job. These two objects are called dependencies. Problem with this is
+flexibility one class is responsible for constructing two other classes. Idea of dependency injection is to
+separate/isolate classes and pass them to other classes when they need them.
+
+1. Dagger build.gradle:
+   compile 'com.google.dagger:dagger:2.8'
+   annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
+
+2. Create a module for your application call it AppModule
+   Modules are like the classes you make when you first set up dagger to set initializations(set in MyApp or
+   whatever class you extended Application) and within the modules
+   are the methods that provide instances of your actual classes like GiphyClient etc..
+   Modules need the @Module annotation
+   and methods within that provide instances need @Provide annotation
+   and methods that provide only a single instance need @Singleton annotation
+   Our AppModule class provides a single instance of Application
+
+3. Then create a NetModule which will provide again single instance of SharedPreferences and GiphyClient
+
+4. In MyApp you will now build these modules with dagger. Modules can have parameters and can set initial values for
+   the methods within the module if they need any like if you had a method that returns an instance of Retrofit, you can
+   pass the String url to the module's constructor, set the field and pass it to the Retrofit returning method when you
+   need to set the base url.
+
+5. After setting up your modules and instantiating them in MyApp, you need to create Component interface that will define
+   which modules are connected to each other with annotation: @Component(modules={AppModule.class, NetModule.class}).
+   Also specifying where you can inject or use these instances in your classes: void inject(MainActivity activity);
+
+6. In your MainActivity, by doing @Inject GiphyClient giphyClient; dagger will provide an instantiated GiphyClient object
+   just make sure you have ((MyApp) getApplication()).getAppComponent().inject(this); in the onCreate()
+
+
+
+
+
